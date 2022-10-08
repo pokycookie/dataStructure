@@ -19,6 +19,9 @@ public:
 	void setNext(ListNode* next) {
 		nextLink = next;
 	}
+	void setData(const char* newData) {
+		data = (char*)newData;
+	}
 	char* getData() {
 		return data;
 	}
@@ -101,7 +104,7 @@ public:
 		return NULL;
 	}
 	char* get(int index) {
-		if (index < 0) return (char*)"NULL";
+		if (index < 0) return NULL;
 
 		ListNode* current = HEAD;
 		for (int i = 0; i < index; i++) {
@@ -118,18 +121,39 @@ public:
 		}
 		printf("%s\n", current->getData());
 	}
+	void replace(const char* data, ListNode* replaceNode) {
+		if (replaceNode == NULL) return;
+		replaceNode->setData(data);
+	}
 };
 
 void main() {
-	DoubleLinkedList myList = DoubleLinkedList();
-	myList.append("Hello");
-	myList.append("World");
-	myList.append("Hi");
-	myList.append("Poky");
-	myList.append("Cookie");
-	printf("%s\n", myList.get(3));
-	myList.remove(myList.find("Cookie"));
-	myList.printAll();
-	myList.insert("Pretty", myList.find("World"));
-	myList.printAll();
+	DoubleLinkedList myFriends = DoubleLinkedList();
+
+	// 친구목록 추가하기
+	printf("[친구목록 추가하기]\n");
+	myFriends.append("황세웅");
+	myFriends.append("김민수");
+	myFriends.append("이철수");
+	myFriends.append("최얘나");
+	myFriends.printAll();
+	printf("\n");
+
+	// 이름 수정하기
+	printf("[최얘나 => 최예나]\n");
+	myFriends.replace("최예나", myFriends.find("최얘나"));
+	myFriends.printAll();
+	printf("\n");
+
+	// 친구목록 삭제
+	printf("[이철수 삭제]\n");
+	myFriends.remove(myFriends.find("이철수"));
+	myFriends.printAll();
+	printf("\n");
+
+	// 친구목록 중간 삽입
+	printf("[조유리 2번째에 추가]\n");
+	myFriends.insert("조유리", myFriends.find(myFriends.get(1)));
+	myFriends.printAll();
+	printf("\n");
 }
