@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #define true 1
 #define false 0
@@ -30,11 +31,10 @@ public:
 		TOP = newData;
 	}
 	char pop() {
-		if (TOP != NULL) {
-			LinkedList* tempTOP = TOP;
-			TOP = TOP->getPrev();
-			return tempTOP->getValue();
-		}
+		if (TOP == NULL) return NULL;
+		LinkedList* tempTOP = TOP;
+		TOP = TOP->getPrev();
+		return tempTOP->getValue();
 	}
 	int isEmpty() {
 		if (TOP == NULL) return true;
@@ -42,9 +42,25 @@ public:
 	}
 };
 
+int checkSymbol(char symbol) {
+	switch (symbol) {
+	case '+':
+	case '-':
+	case '*':
+	case '/':
+	case '++':
+	case '--':
+	case '^':
+	case '%':
+		return true;
+	default:
+		return false;
+	}
+}
+
 int checkPair(const char* str) {
 	Stack pairStack = Stack();
-	for (int i = 0; i < strlen(str); i++) {
+	for (int i = 0; i < (int)strlen(str); i++) {
 		char value = str[i];
 		switch (value) {
 		case '(':
@@ -65,18 +81,28 @@ int checkPair(const char* str) {
 	else return false;
 }
 
-void main() {
-	Stack myStack = Stack();
-	myStack.push('A');
-	myStack.push('B');
-	myStack.push('C');
-	myStack.push('D');
-	myStack.push('E');
-	printf("%c", myStack.pop());
-	printf("%c", myStack.pop());
-	printf("%c", myStack.pop());
-	printf("%c", myStack.pop());
-	printf("%c\n", myStack.pop());
+float caculator(char* exp) {
+	// 괄호 체크
+	if (!checkPair(exp)) return NULL;
+	// 후위표기법으로 변환
+	Stack expStack = Stack();
+	char* value = (char*)"";
+	for (int i = 0; i < (int)strlen(exp); i++) {
+		char element = exp[i];
+		if (!checkSymbol(element)) value[strlen(value)] = element;
+		else printf("%f", atof(value));
+	}
+	printf("%s", value);
+	return NULL;
+}
 
-	printf("%s\n", checkPair("({1234})+{42*(32+64)+14/2}") ? "true" : "false");
+int main() {
+	// caculator((char*)"123.47 + 246.31");
+	char* value = (char*)"123";
+	char* element = (char*)'A';
+	// strcat_s(value, strlen(element) + strlen(value) + 1, element);
+	// strcat(value, element);
+	printf("%s", value);
+
+	return 0;
 }
