@@ -121,6 +121,7 @@ def conversion(exp: str):
     for i in range(expStack.length()):
         expList.append(expStack.pop())
 
+    print(expList)
     return expList
 
 def caculator(exp: str):
