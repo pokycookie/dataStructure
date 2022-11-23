@@ -34,17 +34,28 @@ public:
 class BST {
 private:
 	Node* root;
-	void traverse(Node* start) {
-		printf("%c ", start->getKey());
-		if (start->getLeft() != NULL) traverse(start->getLeft());
-		if (start->getRight() != NULL) traverse(start->getRight());
+	void traverse(Node* start, int level) {
+		printf("[%d]%c ", level, start->getKey());
+		level++;
+		if (start->getLeft() != NULL) {
+			traverse(start->getLeft(), level);
+		}
+		if (start->getRight() != NULL) {
+			traverse(start->getRight(), level);
+		}
+	}
+	void maxTraverse(Node* start, int level, int* max) {
+		level++;
+		if (level > *max) *max = level;
+		if (start->getLeft() != NULL) maxTraverse(start->getLeft(), level, max);
+		if (start->getRight() != NULL) maxTraverse(start->getRight(), level, max);
 	}
 public:
 	// 생성자
 	BST(char key) {
 		root = new Node(key, NULL, NULL);
 	};
-	// 새로운 key값 삽입
+	// key 삽입
 	void insert(char key) {
 		Node* tempNode = root;
 		while (1) {
@@ -52,6 +63,7 @@ public:
 			if (key < tempNode->getKey()) {
 				if (tempNode->getLeft() == NULL) {
 					Node* newNode = new Node(key, NULL, NULL);
+					printf("%c가 %c의 좌측에 삽입되었습니다.\n", key, tempNode->getKey());
 					tempNode->setLeft(newNode);
 					break;
 				}
@@ -63,6 +75,7 @@ public:
 			else if (key > tempNode->getKey()) {
 				if (tempNode->getRight() == NULL) {
 					Node* newNode = new Node(key, NULL, NULL);
+					printf("%c가 %c의 우측에 삽입되었습니다.\n", key, tempNode->getKey());
 					tempNode->setRight(newNode);
 					break;
 				}
@@ -77,7 +90,47 @@ public:
 			}
 		}
 	}
-	// key값 찾기
+	// key 삭제
+	void remove(char key) {
+		Node* parent = getParent(key);
+		Node* target = search(key);
+
+		// 삭제할 노드가 없음
+		if (target == NULL || parent == NULL) {
+			printf("%c는 존재하지 않습니다.\n", key);
+			return;
+		}
+		// 삭제할 노드가 단말 노드
+		if (target->getLeft() == NULL && target->getRight() == NULL) {
+			if (parent->getLeft() == target) parent->setLeft(NULL);
+			else parent->setRight(NULL);
+			delete target;
+		}
+		// 삭제할 노드의 차수가 1
+		else if (target->getLeft() == NULL || target->getRight() == NULL) {
+			Node* child;
+			if (target->getLeft() != NULL) child = target->getLeft();
+			else child = target->getRight();
+			
+			if (parent->getLeft() == target) parent->setLeft(child);
+			else parent->setRight(child);
+			delete target;
+		}
+		// 삭제할 노드의 차수가 2
+		else {
+			// temp는 후계자
+			Node* tempParent;
+			Node* temp = target->getLeft();
+			while (temp->getRight() != NULL) {
+				tempParent = temp;
+				temp = temp->getRight();
+			}
+			target->setKey(temp->getKey());
+			if (temp->getLeft() == NULL) tempParent->setRight(NULL);
+			else tempParent->setRight(temp->getLeft());
+		}
+	}
+	// key 찾기
 	Node* search(char key) {
 		Node* tempNode = root;
 		int level = 1;
@@ -91,19 +144,41 @@ public:
 				tempNode = tempNode->getRight();
 			}
 			else {
-				printf("\n[%d] %c를 찾았습니다.\n",level, key);
 				return tempNode;
 			}
 			level++;
 		}
-		printf("\n찾는 키가 존재하지 않습니다.\n");
 		return NULL;
 	}
-	
+	// 부모 찾기
+	Node* getParent(char key) {
+		Node* parent = root;
+		Node* tempNode = root;
+		while (1) {
+			if (key < tempNode->getKey()) {
+				if (tempNode->getLeft() == NULL) break;
+				tempNode = tempNode->getLeft();
+			}
+			else if (key > tempNode->getKey()) {
+				if (tempNode->getRight() == NULL) break;
+				tempNode = tempNode->getRight();
+			}
+			else {
+				return tempNode;
+			}
+			parent = tempNode;
+		}
+		return NULL;
+	}
+	// 트리의 높이
+	int getMaxLevel() {
+		int max = 1;
+		maxTraverse(root, 0, &max);
+		return max;
+	}
 	// 트리구조 이미지화
 	void printBST() {
-		Node* tempNode = root;
-		traverse(root);
+		traverse(root, 1);
 	}
 };
 
@@ -113,8 +188,8 @@ int main() {
 	myBST.insert('D');
 	myBST.insert('C');
 	myBST.insert('F');
-	myBST.insert('A');
 	myBST.insert('S');
+	myBST.insert('A');
 	myBST.insert('T');
 	myBST.insert('K');
 	myBST.printBST();
